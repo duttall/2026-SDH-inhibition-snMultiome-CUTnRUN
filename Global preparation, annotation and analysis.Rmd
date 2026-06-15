@@ -35,6 +35,8 @@ library(VariantAnnotation)
 library(purrr)
 library(tidyr)
 
+theme_set(theme_minimal(base_family = "Arial"))
+
 ```
 ####  Load data  ####
 
@@ -131,7 +133,7 @@ p2 <- ggplot(pt, aes(x = Var2, y = Freq, fill = Var1 )) +
 p2
 ggsave("aggregated_samples_prop.tif", height = 5,width = 6)
 DimPlot(aggregated_samples, pt.size = .1, reduction = "umap_RNA", group.by = 'doublet', cols = c("skyblue","black"))+ labs(title = paste("Filtered Nuclei (",round(Percent_doublet*100,digits = 2),"%)", sep = ""))+
-  theme(legend.text  = element_text( size = 14), axis.text=element_blank(),axis.ticks=element_blank(), axis.line = element_line(linewidth =  1))+ xlab("UMAP 1") + ylab("UMAP 2") 
+  theme(legend.text  = element_text( size = 14),plot.title = element_text(face = "plain",hjust = 0), axis.text=element_blank(),axis.title=element_text(size=16),axis.ticks=element_blank(), axis.line = element_line(linewidth =  1))+ xlab("UMAP 1") + ylab("UMAP 2") + NoLegend()
 ggsave("aggregated_filtered_doublets_umap.tif", height = 5,width = 5)
 
 ##Remove doublets and re-normalize 
@@ -310,8 +312,6 @@ saveRDS(aggregated_samples,"aggregated_global.rds")
 #####Proceed to analysis of subclusters then return to this spot####
 ```{r echo=TRUE}
 ###After processing subclusters
-
-aggregated_merged <- merge(x = aggregated_Cardiomyocytes, y=list(aggregated_Cardiac_Fibroblasts,aggregated_Endothelial_Cells,aggregated_Mural,aggregated_Myeloid,aggregated_Lymphoid,aggregated_Epicardial,aggregated_Schwann))
 
 aggregated_samples <- readRDS("aggregated_global.rds")
 
@@ -579,7 +579,7 @@ low_quality <- readLines("low_quality_BCs+CM+CFv2+EC+Mur+Lymph.txt")# Last versi
 Percent_lowquality <- length(low_quality)/length(aggregated_samples@active.ident)
 
 DimPlot(aggregated_samples,reduction = 'umap_RNA', pt.size = .1, cells.highlight = low_quality,cols.highlight = "black",sizes.highlight = .1)+ theme(legend.position="bottom",axis.text=element_blank(),axis.ticks=element_blank(), axis.line = element_line(linewidth =  1),axis.title=element_text(size=16)) + labs(title = paste("Filtered Nuclei (",round(Percent_lowquality*100,digits = 2),"%)", sep = "") )+
-  theme(legend.text  = element_text(size = 14)) + xlab("UMAP 1") + ylab("UMAP 2")+
+  theme(legend.text  = element_text(size = 14),plot.title = element_text(face = "plain")) + xlab("UMAP 1") + ylab("UMAP 2")+
   scale_color_manual(labels = c("High-quality", "Low-quality"), values = c("grey", "black"))
 ggsave("Low_quality_umap.tif", height = 5,width = 5)
 ```
