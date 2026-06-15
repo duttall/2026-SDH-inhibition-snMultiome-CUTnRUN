@@ -37,7 +37,7 @@ library(ggpubr)
 #Load integrated file
 aggregated_samples <- readRDS("aggregated_global.rds")
 
-clust_colors <- c("darkorange2","mediumorchid2","steelblue3","olivedrab","indianred1","hotpink","darkred","green3","cyan")
+clust_colors <- c("darkorange2","mediumorchid2","steelblue3","olivedrab","indianred1","hotpink","darkred","green3","cyan","darkorange4","mediumorchid4","steelblue4")
 treatment_colors <-c("lightskyblue","pink", "steelblue4","red3")    
 ```
 
@@ -98,9 +98,9 @@ aggregated_Endothelial_Cells <- RunUMAP(
 ### Check for potential contamination (skip if already preformed)
 ```{r echo=TRUE}
 
-aggregated_Endothelial_Cells<- FindClusters(aggregated_Endothelial_Cells, graph.name = "wsnn", algorithm = 3, resolution = seq(.1,.5,.1) )
+aggregated_Endothelial_Cells<- FindClusters(aggregated_Endothelial_Cells, graph.name = "wsnn", algorithm = 3, resolution = seq(.2,1,.2) )
 
-Idents(aggregated_Endothelial_Cells) <- aggregated_Endothelial_Cells$wsnn_res.0.5
+Idents(aggregated_Endothelial_Cells) <- aggregated_Endothelial_Cells$wsnn_res.0.6
 
 quick_CT_plot(aggregated_Endothelial_Cells, 2,"WNN_umap",legend = F,label = T,font.size = 8)
 quick_cond_plot(aggregated_Endothelial_Cells, 2,"WNN_umap",legend = F)
@@ -111,16 +111,17 @@ annotation_markers <- c("Myh6","Ttn","Tnnt2","Ryr2", #Cardiomyocytes
                         "Mrc1","Cd68","C1qa","Ms4a7","Ccr2","Cx3cr1",#Myeloid Cells
                         "Cd79a","Ikzf3","Ms4a1","Skap1",#Lymphoid Cells
                         "Upk3b","Upk1b","Clu","Dmkn",# Epicardial cells
-                        "Kcna1","Kcna2","Cdh19","Plp1")#Schwann cells
+                        "Kcna1","Kcna2","Cdh19","Plp1", #Schwann cells
+                        "Hbb-bs","Hbb-bt")#RBC markers that often contaminate ECs
 
 DotPlot_SCT(seurat_obj = aggregated_Endothelial_Cells, gene_vector = annotation_markers)
 
-contaminated <- Cells(subset(aggregated_Endothelial_Cells, idents = "9") )
+contaminated <- Cells(subset(aggregated_Endothelial_Cells, idents = c("5","9")) )
 low_quality <- readLines("low_quality_BCs+CM+CFv2.txt")
 low_quality <- c(low_quality,contaminated)
 writeLines(low_quality, "low_quality_BCs+CM+CFv2+EC.txt")
 
-aggregated_Endothelial_Cells <- subset(aggregated_Endothelial_Cells, idents = "9", invert = T) 
+aggregated_Endothelial_Cells <- subset(aggregated_Endothelial_Cells, idents = c("5","9"), invert = T) 
 
 ##Go back to redo normalization and check again
 
@@ -136,8 +137,7 @@ annotation_markers <- c( "Cdh5","Pecam1",#General EC
                          "Fabp4","Vegfc",#Vasc EC
                           "Cdh11","Npr3",#Endocardium
                          "Mki67","Aurkb", # Proliferative EC
-                        "Lyve1","Flt4",#Lymphoid EC
-                        "Hbb-bs","Hba-a1"#Arterial EC
+                        "Lyve1","Flt4"#Lymphoid EC
                         )
 ##"Mctp1","Zfp521"#Venous ECs
 
@@ -145,9 +145,9 @@ DotPlot_SCT(seurat_obj = aggregated_Endothelial_Cells, gene_vector = annotation_
 quick_CT_plot(aggregated_Endothelial_Cells, 2,"WNN_umap",legend = F,label = T,font.size = 8)
 quick_cond_plot(aggregated_Endothelial_Cells, 2,"WNN_umap",legend = F)
 
-Endothelial_Cells_cell_types <- c("VEC1","VEC2","Art_EC","VEC3","EndoC","VEC4","LEC","VEC_Prol")
+Endothelial_Cells_cell_types <- c("VEC1","VEC2","VEC3","EndoC","VEC4","VEC_Prol","LEC")
 aggregated_Endothelial_Cells@active.ident<-factor(aggregated_Endothelial_Cells@active.ident, labels = Endothelial_Cells_cell_types)
-Endothelial_Cells_cell_levels <- c("VEC1","VEC2","VEC3","VEC4","EndoC","VEC_Prol","LEC","Art_EC")
+Endothelial_Cells_cell_levels <- c("VEC1","VEC2","VEC3","VEC4","EndoC","VEC_Prol","LEC")
 aggregated_Endothelial_Cells@active.ident<-factor(aggregated_Endothelial_Cells@active.ident, levels = Endothelial_Cells_cell_levels)
 
 aggregated_Endothelial_Cells$Cell_state <- Idents(aggregated_Endothelial_Cells)
@@ -156,8 +156,7 @@ annotation_markers <- c( "Cdh5","Pecam1",#General EC
                          "Fabp4","Vegfc",#Vasc EC
                           "Cdh11","Npr3",#Endocardium
                          "Mki67","Aurkb", # Proliferative EC
-                        "Lyve1","Flt4",#Lymphoid EC
-                        "Hbb-bs","Hba-a1"#Arterial EC
+                        "Lyve1","Flt4"#Lymphoid EC
                         )
 
 DotPlot_SCT(seurat_obj = aggregated_Endothelial_Cells, gene_vector = annotation_markers,pt.size = 14)
@@ -199,8 +198,8 @@ EC_SalShamvMalSham  <- FindMarkers(aggregated_Endothelial_Cells, ident.1 = "Sali
 EC_SalShamvMalSham_sig <- subset(EC_SalShamvMalSham, BH_p_val_adj < 0.05 )
 
 lab_italics <- paste0("italic('", rownames(EC_SalShamvMalSham), "')")
-select_labels <-c(head(row.names(subset(EC_SalShamvMalSham, avg_log2FC > 0)),n=15),head(row.names(subset(EC_SalShamvMalSham, avg_log2FC < 0)),n=3))
-select_labels <- paste0("italic('",c(head(row.names(subset(EC_SalShamvMalSham, avg_log2FC > 0)),n=15),head(row.names(subset(EC_SalShamvMalSham, avg_log2FC < 0)),n=3)), "')")
+select_labels <-c(head(row.names(subset(EC_SalShamvMalSham, avg_log2FC > 0)),n=15),head(row.names(subset(EC_SalShamvMalSham, avg_log2FC < 0)),n=5))
+select_labels <- paste0("italic('",c(head(row.names(subset(EC_SalShamvMalSham, avg_log2FC > 0)),n=15),head(row.names(subset(EC_SalShamvMalSham, avg_log2FC < 0)),n=5)), "')")
 
 up_down_volcano(EC_SalShamvMalSham, selectLab =  select_labels,italicLab = lab_italics,up_label = paste("Saline Sham Upregulated Genes (",sum(EC_SalShamvMalSham_sig$avg_log2FC > 0)," significant)", sep = ""),down_label = paste("Malonate Sham upregulated Genes (",sum(EC_SalShamvMalSham_sig$avg_log2FC < 0)," significant)", sep = ""),volcano_name = "EC_SalShamvMalSham_volcano.tif", up_x = max(EC_SalShamvMalSham$avg_log2FC)+1.5,down_x = min(EC_SalShamvMalSham$avg_log2FC)-1.5,cols = c("pink2","lightskyblue3","grey" ))
 
@@ -477,7 +476,7 @@ DotPlot_SCT(seurat_obj = aggregated_Myeloid, gene_vector = annotation_markers)
 ## Annotate
 ```{r echo=TRUE}
 #Use markers to identify sub-cell types
-annotation_markers <- c("Ptprc","Arhgap15","Ccr2","Cx3cr1", # Monocyte
+annotation_markers <- c("Ly6c2","Arhgap15","Ccr2","Cx3cr1", # Monocyte
                         "Itgam","Mrc1","Cd68","C1qa","Lyve1"#Myeloid Cells
                         
                         )
@@ -493,7 +492,7 @@ aggregated_Myeloid@active.ident<-factor(aggregated_Myeloid@active.ident, levels 
 
 aggregated_Myeloid$Cell_state <- Idents(aggregated_Myeloid)
 
-annotation_markers <- c("Ptprc","Arhgap15","Ccr2","Cx3cr1", # Monocyte
+annotation_markers <- c("Ccr2","Arhgap15","Plac8","Ifitm6", # Monocyte
                         "Itgam","Mrc1","Cd68","C1qa","Lyve1"#Myeloid Cells
                         
                         )
@@ -639,6 +638,7 @@ aggregated_Lymphoid <- subset(aggregated_Lymphoid, idents = "3", invert = T)
 ```
 ## Annotate after contamination removal
 ```{r echo=TRUE}
+aggregated_Lymphoid<- FindClusters(aggregated_Lymphoid, graph.name = "wsnn", algorithm = 3, resolution = seq(.1,.5,.1) )
 
 Idents(aggregated_Lymphoid) <- aggregated_Lymphoid$wsnn_res.0.4
 
