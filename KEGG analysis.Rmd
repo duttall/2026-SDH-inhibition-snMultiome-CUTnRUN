@@ -27,10 +27,10 @@ library(stringr)
 
 ```{r echo=TRUE}
 ###KEGG Analaysis (repeat for each dataset)
-KEGGcluster<- read.xlsx("CF_all_DEGs_sig.xlsx")# repeat for each comparison
-sig_genes <- KEGGcluster[KEGGcluster$cluster == "CF1",]# KEGGcluster$comparison for condition comparisons and KEGGcluster$cluster for cluster comparisons
+KEGGcluster<- read.xlsx("EC_Sal_vs_Mal_sig.xlsx")# repeat for each comparison
+sig_genes <- KEGGcluster[KEGGcluster$comparison == "Saline MI vs Malonate MI",]# KEGGcluster$comparison for condition comparisons and KEGGcluster$cluster for cluster comparisons
 sig_genes  <- subset(sig_genes ,  avg_log2FC > 0.25) #for upregulated or Saline MI or upregulated cluster
-#sig_genes  <- subset(sig_genes ,  avg_log2FC < -0.25) # for downregulated or Malonate MI
+sig_genes  <- subset(sig_genes ,  avg_log2FC < -0.25) # for downregulated or Malonate MI
 
 # Remove duplicates genes, keeping the first occurrence (very rare occurrence due to one gene having multiple EnsembleID)
 sig_genes <- sig_genes %>%
@@ -85,7 +85,7 @@ for (i in 1:nrow(kegg_df)) {
 }
 
 
-write.xlsx(kegg_df, "CF1_KEGG_results.xlsx") #repeat for downregulated and other subculsters
+write.xlsx(kegg_df, "EC_MalMI_KEGG_results.xlsx") #repeat for downregulated and other subculsters
 
 ```
 ##Identify key and unique KEGG Terms )
@@ -213,31 +213,31 @@ Cond_CM_SalvMal_KEGG <- rbind(kegg_df_CM_SalSham,kegg_df_CM_MalSham)
 Cond_CM_SalvMal_KEGG <- rbind(Cond_CM_SalvMal_KEGG,kegg_df_CM_SalMI)
 Cond_CM_SalvMal_KEGG <- rbind(Cond_CM_SalvMal_KEGG,kegg_df_CM_MalMI)
 Cond_CM_SalvMal_KEGG <- Cond_CM_SalvMal_KEGG[,cols_keep]
-Cond_CM_SalvMal_KEGG <- rename(Cond_CM_SalvMal_KEGG, gene_symbols = "geneID")
+Cond_CM_SalvMal_KEGG <- rename(Cond_CM_SalvMal_KEGG, geneID = gene_symbols)
 
 Cond_CF_SalvMal_KEGG <- rbind(kegg_df_CF_SalSham,kegg_df_CF_MalSham)
 Cond_CF_SalvMal_KEGG <- rbind(Cond_CF_SalvMal_KEGG,kegg_df_CF_SalMI)
 Cond_CF_SalvMal_KEGG <- rbind(Cond_CF_SalvMal_KEGG,kegg_df_CF_MalMI)
 Cond_CF_SalvMal_KEGG <- Cond_CF_SalvMal_KEGG[,cols_keep]
-Cond_CF_SalvMal_KEGG <- rename(Cond_CF_SalvMal_KEGG, gene_symbols = "geneID")
+Cond_CF_SalvMal_KEGG <- rename(Cond_CF_SalvMal_KEGG, geneID = gene_symbols)
 
 Cond_EC_SalvMal_KEGG <- rbind(kegg_df_EC_SalSham,kegg_df_EC_MalSham)
 Cond_EC_SalvMal_KEGG <- rbind(Cond_EC_SalvMal_KEGG,kegg_df_EC_SalMI)
 Cond_EC_SalvMal_KEGG <- rbind(Cond_EC_SalvMal_KEGG,kegg_df_EC_MalMI)
 Cond_EC_SalvMal_KEGG <- Cond_EC_SalvMal_KEGG[,cols_keep]
-Cond_EC_SalvMal_KEGG <- rename(Cond_EC_SalvMal_KEGG, gene_symbols = "geneID")
+Cond_EC_SalvMal_KEGG <- rename(Cond_EC_SalvMal_KEGG, geneID = gene_symbols)
 
 Cond_Mural_SalvMal_KEGG <- rbind(kegg_df_Mural_SalSham,kegg_df_Mural_MalSham)
 Cond_Mural_SalvMal_KEGG <- rbind(Cond_Mural_SalvMal_KEGG,kegg_df_Mural_SalMI)
 Cond_Mural_SalvMal_KEGG <- rbind(Cond_Mural_SalvMal_KEGG,kegg_df_Mural_MalMI)
 Cond_Mural_SalvMal_KEGG <- Cond_Mural_SalvMal_KEGG[,cols_keep]
-Cond_Mural_SalvMal_KEGG <- rename(Cond_Mural_SalvMal_KEGG, gene_symbols = "geneID")
+Cond_Mural_SalvMal_KEGG <- rename(Cond_Mural_SalvMal_KEGG, geneID = gene_symbols)
 
 Cond_Mye_SalvMal_KEGG <- rbind(kegg_df_Mye_SalSham,kegg_df_Mye_MalSham)
 Cond_Mye_SalvMal_KEGG <- rbind(Cond_Mye_SalvMal_KEGG,kegg_df_Mye_SalMI)
 Cond_Mye_SalvMal_KEGG <- rbind(Cond_Mye_SalvMal_KEGG,kegg_df_Mye_MalMI)
 Cond_Mye_SalvMal_KEGG <- Cond_Mye_SalvMal_KEGG[,cols_keep]
-Cond_Mye_SalvMal_KEGG <- rename(Cond_Mye_SalvMal_KEGG, gene_symbols = "geneID")
+Cond_Mye_SalvMal_KEGG <- rename(Cond_Mye_SalvMal_KEGG, geneID = gene_symbols)
 
 # Load the library
 library(writexl)
@@ -280,7 +280,9 @@ CF_SalMI_KEGG <- c("Hypertrophic cardiomyopathy - Mus musculus (house mouse)","E
 
 CF_MalMI_KEGG <-c("Hippo signaling pathway - Mus musculus (house mouse)","AMPK signaling pathway - Mus musculus (house mouse)","Autophagy - animal - Mus musculus (house mouse)","Notch signaling pathway - Mus musculus (house mouse)")
 
-EC_MalSham_KEGG <- c("Antigen processing and presentation - Mus musculus (house mouse)")
+EC_MalSham_KEGG <- c("Antigen processing and presentation - Mus musculus (house mouse)","Endocytosis - Mus musculus (house mouse)"
+,"TNF signaling pathway - Mus musculus (house mouse)"
+,"Lipid and atherosclerosis - Mus musculus (house mouse)")
 
 EC_SalSham_KEGG <- c("Oxidative phosphorylation - Mus musculus (house mouse)","Citrate cycle (TCA cycle) - Mus musculus (house mouse)","Cardiac muscle contraction - Mus musculus (house mouse)","Pyruvate metabolism - Mus musculus (house mouse)")
 
@@ -306,12 +308,12 @@ Mye_MalMI_KEGG <-c("AMPK signaling pathway - Mus musculus (house mouse)","Wnt si
 ```
 ## Plot enriched pathways
 ```{r echo=TRUE}
-ggplot(kegg_df_EC_MalMI[kegg_df_EC_MalMI$Description %in% EC_MalMI_KEGG,], aes(x=log10p.adjusted, y= reorder(labels_wrapped,log10p.adjusted), fill = qvalue)) +
+ggplot(kegg_df_EC_MalSham[kegg_df_EC_MalSham$Description %in% EC_MalSham_KEGG,], aes(x=log10p.adjusted, y= reorder(labels_wrapped,log10p.adjusted), fill = qvalue)) +
   geom_col() +
   labs(title = "", x = "-10log[p.adjusted]", y = "") + scale_fill_gradient(low="red", high="blue") +
   theme(text = element_text(size=26))
 
-ggsave("EC_MalMI_KEGG_bar.tif",height = 4,width = 8)
+ggsave("EC_MalSham_KEGG_bar.tif",height = 4,width = 8)
 
 ##Repeat for each cluster/condition
 
