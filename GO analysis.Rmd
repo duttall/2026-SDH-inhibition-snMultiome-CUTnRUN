@@ -21,10 +21,10 @@ library(stringr)
 
 ```{r echo=TRUE}
 ###GO Analaysis (repeat for each dataset)
-GOcluster<- read.xlsx("CM_all_DEGs_sig.xlsx")# repeat for each com
+GOcluster<- read.xlsx("EC_Sal_vs_Mal_sig.xlsx")# repeat for each comparison
 
 
-GOfile <- GOcluster[GOcluster$cluster=="CM1",] # GOcluster$comparison for MAST and GOcluster$cluster for MAST
+GOfile <- GOcluster[GOcluster$comparison=="Saline MI vs Malonate MI",] # GOcluster$comparison for MAST and GOcluster$cluster for MAST
 
 #GOfile <- subsetMP3vMP4.markers
 
@@ -54,7 +54,7 @@ for (i in 1:nrow(CT_GO.df)) {
   CT_GO.df$labels_wrapped[i] <- split_into_two_lines(CT_GO.df$labels[i])
 }
 
-write.xlsx(CT_GO.df,"CM1_GO_downregulated.xlsx") #repeat for downregulated and other subculsters
+write.xlsx(CT_GO.df,"EC_SalMI_GO_upregulated.xlsx") #repeat for downregulated and other subculsters
 
 ```
 ##Identify key and unique Go Terms )
@@ -140,12 +140,12 @@ CT_GO.df_CF_MalMI_filtered <- dplyr::filter(CT_GO.df_CF_MalMI, !Description %in%
 CT_GO.df_CF_SalMI_filtered <- dplyr::filter(CT_GO.df_CF_SalMI, !Description %in% CT_GO.df_CF_MalMI$Description)
 
 CT_GO.df_EC_MalSham <- read.xlsx("EC_MalSham_GO_upregulated.xlsx")
-#CT_GO.df_EC_MalSham$condition <- "Malonate Sham" # No significant GO terms
+CT_GO.df_EC_MalSham$condition <- "Malonate Sham" 
 CT_GO.df_EC_SalSham <- read.xlsx("EC_SalSham_GO_upregulated.xlsx")
 CT_GO.df_EC_SalSham$condition <- "Saline Sham"
 
-CT_GO.df_EC_SalSham <- dplyr::filter(CT_GO.df_EC_SalSham, !Description %in% CT_GO.df_EC_MalSham$Description)
-CT_GO.df_EC_MalSham <- dplyr::filter(CT_GO.df_EC_MalSham, !Description %in% CT_GO.df_EC_SalSham$Description)
+CT_GO.df_EC_SalSham_filtered <- dplyr::filter(CT_GO.df_EC_SalSham, !Description %in% CT_GO.df_EC_MalSham$Description)
+CT_GO.df_EC_MalSham_filtered <- dplyr::filter(CT_GO.df_EC_MalSham, !Description %in% CT_GO.df_EC_SalSham$Description)
 
 CT_GO.df_EC_MalMI <- read.xlsx("EC_MalMI_GO_upregulated.xlsx")
 CT_GO.df_EC_MalMI$condition <- "Malonate MI"
@@ -159,9 +159,6 @@ CT_GO.df_Mural_MalSham <- read.xlsx("Mural_MalSham_GO_upregulated.xlsx")
 #CT_GO.df_Mural_MalSham$condition <- "Malonate Sham" # No significant GO terms
 CT_GO.df_Mural_SalSham <- read.xlsx("Mural_SalSham_GO_upregulated.xlsx")
 CT_GO.df_Mural_SalSham$condition <- "Saline Sham"
-
-CT_GO.df_Mural_SalSham <- dplyr::filter(CT_GO.df_Mural_SalSham, !Description %in% CT_GO.df_Mural_MalSham$Description)
-CT_GO.df_Mural_MalSham <- dplyr::filter(CT_GO.df_Mural_MalSham, !Description %in% CT_GO.df_Mural_SalSham$Description)
 
 CT_GO.df_Mural_MalMI <- read.xlsx("Mural_MalMI_GO_upregulated.xlsx")
 CT_GO.df_Mural_MalMI$condition <- "Malonate MI"
@@ -386,6 +383,11 @@ EC_SalSham_upregulated_terms <- c("cellular respiration"
   ,"regulation of RNA splicing"                               
   ,"endothelial cell migration"  )
 
+EC_MalSham_upregulated_terms <- c("T cell mediated immunity" 
+  ,"negative regulation of DNA biosynthetic process" 
+  ,"negative regulation of locomotion"                      
+  ,"regulation of T cell mediated immunity"  )
+
 EC_SalMI_upregulated_terms <- c("collagen fibril organization"             
   ,"transforming growth factor beta production"   
   ,"response to interferon-beta"
@@ -441,12 +443,12 @@ Mye_SalMI_upregulated_terms <- c("extracellular matrix organization"
 ## Plot GO terms
 ```{r echo=TRUE}
 ##Perform for each GO output and term list above
-ggplot(CT_GO.df_CM3[CT_GO.df_CM3$Description %in% CM3_upregulated_terms,], aes(x=log10p.adjusted, y= reorder(labels_wrapped,log10p.adjusted), color = qvalue,  size=Count)) +
+ggplot(CT_GO.df_EC_MalSham[CT_GO.df_EC_MalSham$Description %in% EC_MalSham_upregulated_terms,], aes(x=log10p.adjusted, y= reorder(labels_wrapped,log10p.adjusted), color = qvalue,  size=Count)) +
   geom_point() +
   labs(title = "", x = "-10log[p.adjusted]", y = "") + scale_color_gradient(low="red", high="blue") +
   theme(text = element_text(size=21))
 
-ggsave("CM3_GO_upregulated.tif",height = 5,width = 8)
+ggsave("EC_MalSham_GO_upregulated.tif",height = 5,width = 8)
 
 ##Repeat for each cluster/condition
 
